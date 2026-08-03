@@ -30,4 +30,15 @@ out the pipeline.
 - Subramanian Ganesh DA25M626
 - Akash N DA25M536
 
+## Data & Model Storage
+
+We use DVC to version our dataset and models. The actual files are stored
+in a shared Google Drive folder (not in Git):
+https://drive.google.com/drive/folders/1RiJTIe29SK3OjqTYNKjv1E4qJbCE5Cf9
+
+To pull the data after cloning this repo, run `dvc pull`. You'll need to
+be added as a test user on our Google OAuth app first - ping Aksshay for
+access and for the client ID/secret (not committed here for security
+reasons).
+
 ## Setup and Installation
