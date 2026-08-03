@@ -5,8 +5,10 @@ __pycache__/
 .venv/
 venv/
 
-# Data
-data/
+# Data (tracked by DVC, not Git)
+data/raw/
+*.parquet
+*.csv
 
 # Env / secrets
 .env

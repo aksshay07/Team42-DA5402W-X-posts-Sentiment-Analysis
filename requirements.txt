@@ -17,6 +17,7 @@ mlflow==2.13.0
 
 # DVC
 dvc==3.51.2
+pathspec==0.12.1  # pin: dvc otherwise throws error with wrong pathspec
 
 # Serving
 fastapi==0.111.0
