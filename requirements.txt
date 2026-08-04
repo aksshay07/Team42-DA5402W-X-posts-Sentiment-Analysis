@@ -20,6 +20,7 @@ dvc==3.51.2
 pathspec==0.12.1  # pin: dvc otherwise throws error with wrong pathspec
 dvc-gdrive==3.0.1  # needed for our Google Drive remote (dvc push/pull)
 protobuf<5  # pin: dvc-gdrive pulls in protobuf 7.x which conflicts with mlflow's protobuf<5 requirement
+pyOpenSSL==24.2.1  # pin: dvc-gdrive/PyDrive2 otherwise resolves an incompatible cryptography version, breaking OpenSSL.crypto (lib.GEN_EMAIL AttributeError)
 
 # Serving
 fastapi==0.111.0
