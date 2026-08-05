@@ -1,6 +1,0 @@
-outs:
-- md5: 5df60b6ad2a98d776679837a3f7a553d.dir
-  size: 189754
-  nfiles: 24
-  hash: md5
-  path: streamed
