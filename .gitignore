@@ -18,3 +18,7 @@ data/raw/
 .idea/
 .DS_Store
 /data/processed
+/data/streamed
+data/.checkpoint/
+hadoop/
+
