@@ -36,3 +36,21 @@ stages:
       md5: a196c90f6ee300c2a2d0481e371fcff3.dir
       size: 4403669
       nfiles: 5
+  train_distilbert:
+    cmd: python training/train_distilbert.py
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: af76514abef5d4487a17b5fa013d8f96.dir
+      size: 1266186
+      nfiles: 8
+    - path: training/train_distilbert.py
+      hash: md5
+      md5: d68e48e769916dc5a3a7cec3c5b7f84d
+      size: 7399
+    outs:
+    - path: models/distilbert/
+      hash: md5
+      md5: 8879df47c71c385eb16629b98f1a05d2.dir
+      size: 268794090
+      nfiles: 11

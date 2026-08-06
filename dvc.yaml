@@ -14,3 +14,11 @@ stages:
       - training/train_logreg.py
     outs:
       - models/logreg/
+
+  train_distilbert:
+    cmd: python training/train_distilbert.py
+    deps:
+      - data/processed
+      - training/train_distilbert.py
+    outs:
+      - models/distilbert/

@@ -3,13 +3,7 @@ Model B: DistilBERT fine-tuned for 6-class emotion classification.
 Logs all params, metrics, and the model artifact to MLflow.
 Registers the model in the MLflow Model Registry.
 
-Uses Hugging Face's Trainer API (the standard approach for this dataset —
-see e.g. the "NLP with Transformers" book's dair-ai/emotion chapter)
-rather than a hand-rolled training loop: Trainer manages device
-placement, batching, and CPU thread usage internally, which matters here
-since this script also runs inside the Airflow container (CPU-only, no
-MPS/CUDA access) where a manual loop was observed to oversubscribe
-threads badly enough to hang rather than train.
+
 """
 import os
 import shutil
@@ -90,11 +84,6 @@ def main():
         texts, labels, test_size=0.2, random_state=42, stratify=labels
     )
 
-    # batch_size overridable via env: Docker Desktop's default VM memory
-    # (7.75GB, shared across all 8 docker-compose services) doesn't leave
-    # enough headroom for batch_size=32 alongside the rest of the stack.
-    # train_pipeline_dag/retrain_dag set this lower; host runs (step 6,
-    # with MPS acceleration) are unaffected and keep the default of 32.
     params = {
         "epochs": 3,
         "batch_size": int(os.getenv("DISTILBERT_BATCH_SIZE", "32")),
