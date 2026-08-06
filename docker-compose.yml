@@ -30,9 +30,20 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
 
   mlflow:
-    image: python:3.12-slim
+    image: ghcr.io/mlflow/mlflow:v2.13.0
     ports:
+      # 5000 on macOS is occupied by the AirPlay Receiver service
       - "5001:5000"
+    # --serve-artifacts lets clients read/write artifacts over HTTP instead of needing filesystem access.
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri sqlite:///mlflow/mlflow.db
+      --serve-artifacts
+      --artifacts-destination /mlflow/artifacts
+    volumes:
+      - mlflow-data:/mlflow
 
   airflow-webserver:
     image: apache/airflow:2.9.2
@@ -65,3 +76,4 @@ services:
 
 volumes:
   postgres-data:
+  mlflow-data:
