@@ -10,11 +10,47 @@ stages:
       nfiles: 3
     - path: processing/preprocess.py
       hash: md5
-      md5: 8687bede03d2f3aafce8bef524e158db
-      size: 1276
+      md5: db219bd3ca9ce1218e26f9347753118e
+      size: 1900
     outs:
     - path: data/processed
       hash: md5
-      md5: 31fa51c17f9fd1839994ab7c47a26e4f.dir
+      md5: af76514abef5d4487a17b5fa013d8f96.dir
       size: 1266186
       nfiles: 8
+  train_logreg:
+    cmd: python training/train_logreg.py
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: af76514abef5d4487a17b5fa013d8f96.dir
+      size: 1266186
+      nfiles: 8
+    - path: training/train_logreg.py
+      hash: md5
+      md5: 6610f58eb5708a1d425dbac3404f74ec
+      size: 2779
+    outs:
+    - path: models/logreg/
+      hash: md5
+      md5: a196c90f6ee300c2a2d0481e371fcff3.dir
+      size: 4403669
+      nfiles: 5
+  train_distilbert:
+    cmd: python training/train_distilbert.py
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: af76514abef5d4487a17b5fa013d8f96.dir
+      size: 1266186
+      nfiles: 8
+    - path: training/train_distilbert.py
+      hash: md5
+      md5: d68e48e769916dc5a3a7cec3c5b7f84d
+      size: 7399
+    outs:
+    - path: models/distilbert/
+      hash: md5
+      md5: 8879df47c71c385eb16629b98f1a05d2.dir
+      size: 268794090
+      nfiles: 11

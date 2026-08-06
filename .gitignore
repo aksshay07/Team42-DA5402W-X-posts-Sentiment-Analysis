@@ -21,4 +21,6 @@ data/raw/
 /data/streamed
 data/.checkpoint/
 hadoop/
+mlruns/
+mlflow.db
 
