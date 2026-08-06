@@ -6,3 +6,11 @@ stages:
       - processing/preprocess.py
     outs:
       - data/processed
+
+  train_logreg:
+    cmd: python training/train_logreg.py
+    deps:
+      - data/processed
+      - training/train_logreg.py
+    outs:
+      - models/logreg/
