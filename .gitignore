@@ -24,4 +24,6 @@ hadoop/
 mlruns/
 mlflow.db
 mlartifacts/
+monitoring/predictions.db
+airflow/logs/
 
