@@ -1,3 +1,38 @@
+x-airflow-common: &airflow-common
+
+  build:
+    context: .
+    dockerfile: airflow/Dockerfile
+  environment:
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__FERNET_KEY: ""
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth
+    MLFLOW_TRACKING_URI: http://mlflow:5000
+    KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+    DISTILBERT_BATCH_SIZE: "8"
+
+    OMP_NUM_THREADS: "4"
+    MKL_NUM_THREADS: "4"
+  volumes:
+    - ./airflow/dags:/opt/airflow/dags
+    - ./airflow/logs:/opt/airflow/logs
+    - ./airflow/plugins:/opt/airflow/plugins
+    - ./data:/opt/airflow/data
+    - ./models:/opt/airflow/models
+    - ./kafka:/opt/airflow/kafka
+    - ./processing:/opt/airflow/processing
+    - ./training:/opt/airflow/training
+    - ./monitoring:/opt/airflow/monitoring
+  depends_on:
+    postgres:
+      condition: service_healthy
+  networks:
+    - sentiment-net
+
 services:
   postgres:
     image: postgres:14
@@ -7,11 +42,19 @@ services:
       POSTGRES_DB: airflow
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+    networks:
+      - sentiment-net
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - sentiment-net
 
   kafka:
     image: confluentinc/cp-kafka:7.6.0
@@ -28,6 +71,8 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - sentiment-net
 
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.13.0
@@ -45,17 +90,48 @@ services:
     volumes:
       - mlflow-data:/mlflow
 
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db migrate
+        airflow users create \
+          --username admin \
+          --password admin \
+          --firstname admin \
+          --lastname admin \
+          --role Admin \
+          --email admin@example.com
+          --password admin
+
   airflow-webserver:
-    image: apache/airflow:2.9.2
-    depends_on:
-      - postgres
+    <<: *airflow-common
+    command: webserver
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
 
   airflow-scheduler:
-    image: apache/airflow:2.9.2
+    <<: *airflow-common
+    command: scheduler
+    restart: always
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
 
   api:
     build: .
@@ -77,3 +153,6 @@ services:
 volumes:
   postgres-data:
   mlflow-data:
+
+networks:
+  sentiment-net:
