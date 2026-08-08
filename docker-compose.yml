@@ -89,6 +89,8 @@ services:
       --artifacts-destination /mlflow/artifacts
     volumes:
       - mlflow-data:/mlflow
+    networks:
+      - sentiment-net
 
   airflow-init:
     <<: *airflow-common
@@ -104,7 +106,6 @@ services:
           --lastname admin \
           --role Admin \
           --email admin@example.com
-          --password admin
 
   airflow-webserver:
     <<: *airflow-common
@@ -139,16 +140,22 @@ services:
       - "8000:8000"
     depends_on:
       - mlflow
+    networks:
+      - sentiment-net
 
   prometheus:
     image: prom/prometheus:latest
     ports:
       - "9090:9090"
+    networks:
+      - sentiment-net
 
   grafana:
     image: grafana/grafana:latest
     ports:
       - "3000:3000"
+    networks:
+      - sentiment-net
 
 volumes:
   postgres-data:
