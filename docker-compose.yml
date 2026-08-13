@@ -138,6 +138,10 @@ services:
     build: .
     ports:
       - "8000:8000"
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    volumes:
+      - ./monitoring:/app/monitoring
     depends_on:
       - mlflow
     networks:
@@ -147,6 +151,8 @@ services:
     image: prom/prometheus:latest
     ports:
       - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - sentiment-net
 
