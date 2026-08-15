@@ -160,12 +160,21 @@ services:
     image: grafana/grafana:latest
     ports:
       - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
     networks:
       - sentiment-net
 
 volumes:
   postgres-data:
   mlflow-data:
+  grafana-data:
 
 networks:
   sentiment-net:
